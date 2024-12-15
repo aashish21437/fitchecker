@@ -101,7 +101,7 @@ const SummaryPage: React.FC = () => {
             </div>
 
             <div>
-              <h3 className="text-lg font-medium text-gray-900">Ingredients</h3>
+              <h3 className="text-lg font-medium text-gray-900">Recipe & Ingredients</h3>
               <ul className="mt-2 list-disc list-inside space-y-1">
                 {dishData.ingredients.map((ingredient: any, index: number) => (
                   <li key={index} className="text-gray-600">{ingredient.name}</li>

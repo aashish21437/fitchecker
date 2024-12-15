@@ -1,13 +1,13 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { FormProvider } from './context/FormContext';
+import { FormContextProvider } from './context/FormContext';
 import PersonalInfoPage from './pages/PersonalInfoPage';
 import DishPage from './pages/DishPage';
 import SummaryPage from './pages/SummaryPage';
 
-function App() {
+const App: React.FC = () => {
   return (
-    <FormProvider>
+    <FormContextProvider>
       <Router>
         <Routes>
           <Route path="/" element={<PersonalInfoPage />} />
@@ -15,8 +15,8 @@ function App() {
           <Route path="/summary" element={<SummaryPage />} />
         </Routes>
       </Router>
-    </FormProvider>
+    </FormContextProvider>
   );
-}
+};
 
 export default App;

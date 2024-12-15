@@ -149,6 +149,7 @@ import { useNavigate } from 'react-router-dom';
 import { useFormContext } from '../context/FormContext';
 import { Search, Utensils } from 'lucide-react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { getRecipeByName } from '../fetchRecipe';
 
 const DishPage: React.FC = () => {
   const navigate = useNavigate();
@@ -164,20 +165,23 @@ const DishPage: React.FC = () => {
   const fetchDishData = async () => {
     setLoading(true);
     try {
-      const prompt = `Provide me all the major ingredients of this dish: ${dishData.name} in a comma-separated format.`;
-      const result = await model.generateContent(prompt);
-      console.log(JSON.stringify(result, null, 2));  // Logging the full result for debugging
-
-      const ingredientsText = result?.response?.candidates[0]?.content?.parts[0]?.text;
-      const ingredientsList = ingredientsText.split(/,\s*|\sand\s*/).map(ingredient => ingredient.trim());
-
-      setDishData({
-        ...dishData,
-        ingredients: ingredientsList.map(ingredient => ({ name: ingredient, checked: false }))
-      });
-
+      const recipeData = await getRecipeByName(dishData.name);
+  
+      if (recipeData) {
+        const ingredientsList = recipeData.instructions
+          .split(/,\s*|\sand\s*/)
+          .map((ingredient: string) => ingredient.trim());
+  
+        setDishData({
+          ...dishData,
+          ingredients: ingredientsList.map((ingredient) => ({ name: ingredient, checked: false })),
+          recipeDetails: recipeData, // Add details to state if needed
+        });
+      } else {
+        console.error("Recipe not found.");
+      }
     } catch (error) {
-      console.error('Error fetching dish data:', error);
+      console.error("Error fetching recipe:", error);
     } finally {
       setLoading(false);
     }
@@ -202,7 +206,7 @@ const DishPage: React.FC = () => {
     const selected = dishData.ingredients.filter(ing => ing.checked).map(ing => ing.name).join(', ');
 
     try {
-      const nutritionPrompt = `Assuming standard quantities, what is the nutritional value per 100g of a dish made with ${selected}? No need to tell me anything else only tell me the approximate nutritional value per 100g`;
+      const nutritionPrompt = `Assuming standard quantities, what is the nutritional value per 100g of a dish made with ${selected}? No need to tell me anything else only tell me the approximate nutritional value per 100g tell me only this, assume your own quantity and everything else dont tell it is impossible to give an exact nutrional value in the beginning`;
       const nutritionResult = await model.generateContent(nutritionPrompt);
       console.log(nutritionResult);
 
